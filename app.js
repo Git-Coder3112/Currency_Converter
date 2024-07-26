@@ -1,6 +1,6 @@
 // This is where we get our currency info from
 const BASE_URL = "https://api.freecurrencyapi.com/v1/latest";
-const API_KEY = "";
+const API_KEY = "fca_live_LIJt7O4jMHjpfwUTvUuERCzaUwaZxxGXzSVk0N8e";
 
 // Grabbing stuff from our webpage
 const fromCurrency = document.getElementById('from-currency');
@@ -64,7 +64,7 @@ async function convertCurrency() {
             // Show the result
             resultDisplay.textContent = `${amount} ${from} = ${result} ${to}`;
             // Update our chart
-            updateChart(from, to);
+           
         } else {
             // If something went wrong, tell the user
             throw new Error(data.message || 'Failed to fetch exchange rate');
@@ -88,62 +88,6 @@ function swapCurrencies() {
     convertCurrency();
 }
 
-// Makes a chart showing exchange rates over time
-async function updateChart(from, to) {
-    const labels = [];
-    const rates = [];
-
-    // Gets data for the last week
-    for (let i = 6; i >= 0; i--) {
-        // Figure out the date
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        const formattedDate = date.toISOString().split('T')[0];
-        labels.push(formattedDate);
-
-        try {
-            // Ask the API for historical data
-            const response = await fetch(`${BASE_URL}?apikey=${API_KEY}&date=${formattedDate}&base_currency=${from}&currencies=${to}`);
-            const data = await response.json();
-            if (data.data) {
-                // If we got data, add it to our list
-                rates.push(data.data[to]);
-            }
-        } catch (error) {
-            // If something went wrong, log it
-            console.error('Error fetching historical data:', error);
-        }
-    }
-
-    // If we already have a chart, get rid of it
-    if (rateChart) {
-        rateChart.destroy();
-    }
-
-    // Get ready to draw our chart
-    const ctx = document.getElementById('rate-chart').getContext('2d');
-    // Make a new chart
-    rateChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: `${from} to ${to} Exchange Rate`,
-                data: rates,
-                borderColor: '#3498db',
-                tension: 0.1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: false
-                }
-            }
-        }
-    });
-}
 
 // Switches between light and dark mode
 function toggleTheme() {
